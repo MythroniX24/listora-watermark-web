@@ -20,16 +20,19 @@
 
   // ── Engine Constants (1:1 with Kotlin Production Engine) ─────────────────
   const MIN_SIDE = 120;
-  const LOGO_SIZES = [34, 35, 36, 40, 48, 56, 64, 72, 80, 88, 96];
-  const MARGIN_RATIOS = [2.0, 0.667, 1.95, 1.0, 1.5];
-  const FIXED_MARGINS = [16, 20, 23, 24, 28, 32, 36, 40, 48, 56, 64, 72, 80, 96];
+  const LOGO_SIZES = [
+    32, 34, 35, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 60, 64, 72, 80,
+    88, 90, 92, 94, 96, 98, 100, 108, 116, 128
+  ];
+  const MARGIN_RATIOS = [2.0, 2.0 / 3.0, 1.95, 1.0, 1.5, 0.5, 0.75, 1.25];
+  const FIXED_MARGINS = [4, 6, 8, 10, 12, 16, 20, 23, 24, 28, 32, 36, 40, 48, 56, 64, 72, 80, 96, 112, 128, 192];
   const ANCHOR_JITTER = 2;
-  const NCC_ACCEPT = 0.28;
-  const NCC_HIGH_CONFIDENCE = 0.65;
+  const NCC_ACCEPT = 0.22;
+  const NCC_HIGH_CONFIDENCE = 0.40;
   const TIE_SIZE_RATIO = 1.25;
   const TIE_SCORE_RATIO = 0.98;
-  const GAIN_LO = 0.70;
-  const GAIN_HI = 1.30;
+  const GAIN_LO = 0.40;
+  const GAIN_HI = 1.80;
   const GAIN_STEP = 0.05;
   const VERIFY_IMPROVEMENT = 0.90;
   const GUARD_CLIP_TOLERANCE = 14.0;
@@ -694,7 +697,7 @@
 
     denseCornerScan(gray, w, h) {
       const hits = [];
-      const representativeSizes = [34, 35, 36, 40, 48, 56, 64, 72, 80, 96];
+      const representativeSizes = [34, 35, 36, 40, 48, 56, 64, 72, 80, 88, 96, 100];
       const zoneW = Math.min(400, Math.floor(w / 2));
       const zoneH = Math.min(400, Math.floor(h / 2));
       const step = 2;
@@ -737,8 +740,8 @@
     scanCornerCanonical(gray, w, h, corner) {
       const minDim = Math.min(w, h);
       const list = [];
-      const testSizes = [34, 35, 36, 38, 42, 48, 56, 64, 72, 80, 96];
-      const testRatios = [2.0, 0.667, 1.0, 1.5];
+      const testSizes = [32, 34, 35, 36, 38, 40, 42, 48, 56, 64, 72, 80, 88, 96, 100];
+      const testRatios = [2.0, 2.0 / 3.0, 1.0, 1.5, 0.5, 1.25];
 
       for (let sIdx = 0; sIdx < testSizes.length; sIdx++) {
         const s = testSizes[sIdx];
