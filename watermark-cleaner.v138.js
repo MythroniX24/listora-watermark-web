@@ -657,7 +657,7 @@
       const n = t.length;
       const mean = sSum / n;
       const variance = sSq / n - mean * mean;
-      if (variance <= 1e-7) return 0.0;
+      if (variance < 1e-4) return 0.0; // Flat background guard: prevents division-by-noise false positives
       return (dot / n - mean * st.mean) / Math.sqrt(variance * st.variance);
     }
 
@@ -874,7 +874,7 @@
       const n = t.length;
       const mean = sSum / n;
       const variance = sSq / n - mean * mean;
-      if (variance <= 1e-7) return 0.0;
+      if (variance < 1e-4) return 0.0; // Flat background guard: prevents division-by-noise false positives
       return (dot / n - mean * st.mean) / Math.sqrt(variance * st.variance);
     }
 
@@ -1039,7 +1039,8 @@
 
       const isEliminated = bestAbs <= 0.12 && bestAbs < before;
       const isSignificantlyReduced = bestAbs < before * VERIFY_IMPROVEMENT;
-      if (!isEliminated && !isSignificantlyReduced) {
+      const isHighConfidenceHit = hit && (hit.score >= 0.35 || before >= 0.30);
+      if (!isEliminated && !isSignificantlyReduced && !isHighConfidenceHit) {
         this.restore(px, w, snap, hit);
         const resText = (bestAbs === Infinity || isNaN(bestAbs)) ? 'N/A' : bestAbs.toFixed(3);
         return { success: false, hit, note: `Candidate rejected by verification (residual ${resText})` };
