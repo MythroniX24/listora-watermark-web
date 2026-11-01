@@ -52,10 +52,18 @@
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.onload = () => {
+        if (!img.width || !img.height) {
+          resolve(null);
+          return;
+        }
         const cvs = document.createElement('canvas');
         cvs.width = img.width;
         cvs.height = img.height;
         const ctx = cvs.getContext('2d');
+        if (!ctx) {
+          resolve(null);
+          return;
+        }
         ctx.drawImage(img, 0, 0);
         const data = ctx.getImageData(0, 0, img.width, img.height).data;
         resolve(data);
@@ -95,8 +103,9 @@
   }
 
   function handleSliderMove(clientX) {
+    if (typeof clientX !== 'number' || isNaN(clientX)) return;
     const rect = splitContainer.getBoundingClientRect();
-    if (rect.width === 0) return;
+    if (!rect || rect.width <= 0) return;
     const x = clientX - rect.left;
     const pct = (x / rect.width) * 100;
     setSliderPosition(pct);
@@ -129,6 +138,10 @@
   }, { passive: true });
 
   window.addEventListener('touchend', () => {
+    isDraggingSlider = false;
+  });
+
+  window.addEventListener('touchcancel', () => {
     isDraggingSlider = false;
   });
 
@@ -173,12 +186,14 @@
 
   // Global Paste (Ctrl+V)
   window.addEventListener('paste', (e) => {
-    const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+    const clipboardData = e.clipboardData || (e.originalEvent && e.originalEvent.clipboardData);
+    if (!clipboardData || !clipboardData.items) return;
+    const items = clipboardData.items;
     const imageFiles = [];
     for (let i = 0; i < items.length; i++) {
-      if (items[i].type.indexOf('image') !== -1) {
+      if (items[i].type && items[i].type.indexOf('image') !== -1) {
         const blob = items[i].getAsFile();
-        imageFiles.push(blob);
+        if (blob) imageFiles.push(blob);
       }
     }
     if (imageFiles.length > 0) handleFiles(imageFiles);
@@ -224,6 +239,11 @@
   async function runCleaningPipeline(img) {
     const w = img.naturalWidth || img.width;
     const h = img.naturalHeight || img.height;
+    if (!w || !h || w <= 0 || h <= 0) {
+      alert('Invalid or empty image dimensions.');
+      hideProcessing();
+      return;
+    }
 
     // Create Original Canvas
     const origCvs = document.createElement('canvas');
@@ -383,11 +403,17 @@
         const img = await readFileAsImage(file);
         const w = img.naturalWidth || img.width;
         const h = img.naturalHeight || img.height;
+        if (!w || !h || w <= 0 || h <= 0) {
+          throw new Error('Invalid image dimensions');
+        }
 
         const cvs = document.createElement('canvas');
         cvs.width = w;
         cvs.height = h;
         const ctx = cvs.getContext('2d');
+        if (!ctx) {
+          throw new Error('Canvas context unavailable');
+        }
         ctx.drawImage(img, 0, 0);
         const imgData = ctx.getImageData(0, 0, w, h);
         const rgba = imgData.data;
@@ -415,12 +441,13 @@
         dlBtn.className = 'btn btn-secondary';
         dlBtn.style.padding = '4px 10px';
         dlBtn.style.fontSize = '0.78rem';
+        dlBtn.style.marginLeft = '10px';
         dlBtn.textContent = 'Download';
         dlBtn.download = file.name.replace(/\.[^/.]+$/, '') + '-cleaned.png';
         dlBtn.href = cvs.toDataURL('image/png');
 
-        statusEl.textContent = res.success ? `Cleaned (${res.hit.side}px)` : 'Clean (No WM)';
-        statusEl.style.color = res.success ? '#34d399' : '#38bdf8';
+        statusEl.textContent = (res && res.success && res.hit) ? `Cleaned (${res.hit.side}px)` : 'Clean (No WM)';
+        statusEl.style.color = (res && res.success) ? '#34d399' : '#38bdf8';
         statusEl.appendChild(dlBtn);
       } catch (e) {
         const statusEl = itemEl.querySelector('.batch-status');
@@ -516,6 +543,11 @@
     workspace.classList.remove('active');
     batchSection.classList.remove('active');
     dropZone.style.display = 'block';
+    currentOriginalCanvas = null;
+    currentCleanedCanvas = null;
+    splitImgBefore.src = '';
+    splitImgAfter.src = '';
+    batchList.innerHTML = '';
   });
 
   // ── Processing Modal Helpers ───────────────────────────────────────────

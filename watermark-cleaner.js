@@ -675,7 +675,9 @@
 
     pickBestCandidate(hits) {
       if (!hits || hits.length === 0) return null;
-      const sorted = hits.slice().sort((a, b) => b.score - a.score);
+      const valid = hits.filter((h) => h && typeof h.score === 'number' && !isNaN(h.score));
+      if (valid.length === 0) return null;
+      const sorted = valid.sort((a, b) => b.score - a.score);
       let best = sorted[0];
 
       for (let i = 0; i < sorted.length; i++) {
@@ -932,7 +934,7 @@
      * Master Clean method: takes ARGB pixel buffer (Uint32Array) and cleans watermark in place.
      */
     clean(px, w, h) {
-      if (w <= 0 || h <= 0 || Math.min(w, h) < MIN_SIDE) {
+      if (!px || w <= 0 || h <= 0 || px.length < w * h || Math.min(w, h) < MIN_SIDE) {
         return { success: false, note: "Image dimensions too small for watermark cleaning" };
       }
 
@@ -1035,7 +1037,8 @@
       const isSignificantlyReduced = bestAbs < before * VERIFY_IMPROVEMENT;
       if (!isEliminated && !isSignificantlyReduced) {
         this.restore(px, w, snap, hit);
-        return { success: false, hit, note: `Candidate rejected by verification (residual ${bestAbs.toFixed(3)})` };
+        const resText = (bestAbs === Infinity || isNaN(bestAbs)) ? 'N/A' : bestAbs.toFixed(3);
+        return { success: false, hit, note: `Candidate rejected by verification (residual ${resText})` };
       }
 
       this.restore(px, w, snap, hit);
@@ -1090,12 +1093,13 @@
       // ── Stage 4C: Micro-Grain Texture Synthesis ─────────────────────────────
       FastInpainter.matchMicroGrain(px, w, h, hit.x, hit.y, s, bestT, 0.85);
 
+      const cornerName = hit && hit.corner ? hit.corner.toUpperCase() : 'BR';
       return {
         success: true,
         hit,
         residual: bestAbs,
         beforeScore: before,
-        note: `Sparkle erased cleanly (${hit.side}px at ${hit.corner.toUpperCase()}, match ${Math.round(hit.score * 100)}%)`
+        note: `Sparkle erased cleanly (${hit.side}px at ${cornerName}, match ${Math.round(hit.score * 100)}%)`
       };
     }
   }
