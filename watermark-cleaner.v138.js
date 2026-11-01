@@ -17,6 +17,7 @@
     root.SmartWatermarkCleaner = factory();
   }
 }(typeof self !== 'undefined' ? self : this, function () {
+  'use strict';
 
   // ── Engine Constants (1:1 with Kotlin Production Engine) ─────────────────
   const MIN_SIDE = 120;

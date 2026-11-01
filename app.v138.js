@@ -391,12 +391,18 @@
       const file = files[i];
       const itemEl = document.createElement('div');
       itemEl.className = 'batch-item';
-      itemEl.innerHTML = `
-        <span style="font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 60%;">
-          ${file.name}
-        </span>
-        <span class="batch-status" style="color: var(--text-muted); font-size: 0.8rem;">Processing...</span>
-      `;
+
+      const nameSpan = document.createElement('span');
+      nameSpan.style.cssText = 'font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 60%;';
+      nameSpan.textContent = file.name; // Safe against DOM XSS
+
+      const statusSpan = document.createElement('span');
+      statusSpan.className = 'batch-status';
+      statusSpan.style.cssText = 'color: var(--text-muted); font-size: 0.8rem;';
+      statusSpan.textContent = 'Processing...';
+
+      itemEl.appendChild(nameSpan);
+      itemEl.appendChild(statusSpan);
       batchList.appendChild(itemEl);
 
       try {
