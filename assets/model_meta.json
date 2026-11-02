@@ -8,5 +8,6 @@
     "Google Gemini",
     "Imagen 3",
     "DeepMind SynthID Sparkle"
-  ]
+  ],
+  "dataset_type": "Real Uncropped Web Photography (1024x1024)"
 }
