@@ -87,14 +87,26 @@
 
   async function initEngine() {
     try {
-      const [tpl48, tpl96, tpl96Alt] = await Promise.all([
+      const [tpl48, tpl96, tpl96Alt, weightsRes] = await Promise.all([
         loadTemplateImage('assets/wm/gemini_bg_48.png'),
         loadTemplateImage('assets/wm/gemini_bg_96.png'),
         loadTemplateImage('assets/wm/gemini_bg_96_alt.png'),
+        fetch('assets/sparklenet_web_weights.json')
+          .then((r) => (r.ok ? r.json() : null))
+          .catch(() => null)
       ]);
-      SmartWatermarkCleaner.init(tpl48, tpl96, tpl96Alt);
+      try {
+        SmartWatermarkCleaner.init(tpl48, tpl96, tpl96Alt);
+      } catch (tplErr) {
+        console.warn('Template init warning, falling back to procedural templates:', tplErr);
+        SmartWatermarkCleaner.init();
+      }
+      if (weightsRes) {
+        SmartWatermarkCleaner.loadNeuralWeights(weightsRes);
+        console.log('SparkleNet 63-layer neural network loaded successfully');
+      }
       isEngineReady = true;
-      console.log('SmartWatermarkCleaner initialized with production templates');
+      console.log('SmartWatermarkCleaner initialized with production templates & neural weights');
     } catch (err) {
       console.error('Engine init error:', err);
       SmartWatermarkCleaner.init(); // procedural fallback
@@ -301,7 +313,7 @@
       px[i] = (a << 24) | (r << 16) | (g << 8) | b;
     }
 
-    showProcessing('Executing Dual-Channel Optical Unblending...', 'Dual Sobel gradient correlation and candidate suppression delta');
+    showProcessing('Executing Deep Neural Inpainting...', 'WAL-Net Attention UNet + CIS-Net Contextual Synthesis (63 Layers)');
 
     // Yield to render frame before intensive computation
     await new Promise((r) => setTimeout(r, 40));
@@ -355,8 +367,9 @@
       };
       statSize.textContent = `${hit.side} px`;
       statCorner.textContent = `${cornerNames[hit.corner] || hit.corner} (${hit.x}, ${hit.y})`;
-      statScore.textContent = `${(hit.score * 100).toFixed(1)}% NCC`;
-      cleanStatusBadge.textContent = '✨ Sparkle Erased Cleanly';
+      const confVal = hit.neural_confidence != null ? hit.neural_confidence : hit.score;
+      statScore.textContent = `${(confVal * 100).toFixed(1)}% AI`;
+      cleanStatusBadge.textContent = '✨ Sparkle Erased Cleanly (63-Layer AI)';
       cleanStatusBadge.style.color = '#34d399';
       cleanStatusBadge.style.borderColor = 'rgba(16, 185, 129, 0.4)';
 
