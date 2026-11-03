@@ -33,6 +33,15 @@
   const downloadJpgBtn = document.getElementById('downloadJpgBtn');
   const resetBtn = document.getElementById('resetBtn');
 
+  // Mobile Sticky Dock & Tech Tabs
+  const mobileActionDock = document.getElementById('mobileActionDock');
+  const mobileDownloadPngBtn = document.getElementById('mobileDownloadPngBtn');
+  const mobileResetBtn = document.getElementById('mobileResetBtn');
+  const tabBtnPillars = document.getElementById('tabBtnPillars');
+  const tabBtnBenchmark = document.getElementById('tabBtnBenchmark');
+  const panelPillars = document.getElementById('panelPillars');
+  const panelBenchmark = document.getElementById('panelBenchmark');
+
   const batchSection = document.getElementById('batchSection');
   const batchList = document.getElementById('batchList');
   const batchCount = document.getElementById('batchCount');
@@ -111,43 +120,68 @@
     setSliderPosition(pct);
   }
 
+  let dragMoved = false;
+
   splitDivider.addEventListener('mousedown', (e) => {
     isDraggingSlider = true;
+    dragMoved = false;
+    splitDivider.style.transition = 'none';
+    splitBeforeLayer.style.transition = 'none';
     e.preventDefault();
   });
 
   window.addEventListener('mousemove', (e) => {
     if (isDraggingSlider) {
+      dragMoved = true;
       handleSliderMove(e.clientX);
     }
   });
 
   window.addEventListener('mouseup', () => {
     isDraggingSlider = false;
+    setTimeout(() => { dragMoved = false; }, 50);
   });
 
-  // Mobile Touch Support
+  // Mobile Touch Support with Hitbox
   splitDivider.addEventListener('touchstart', (e) => {
     isDraggingSlider = true;
+    dragMoved = false;
+    splitDivider.style.transition = 'none';
+    splitBeforeLayer.style.transition = 'none';
   }, { passive: true });
 
   window.addEventListener('touchmove', (e) => {
     if (isDraggingSlider && e.touches.length > 0) {
+      dragMoved = true;
       handleSliderMove(e.touches[0].clientX);
     }
   }, { passive: true });
 
   window.addEventListener('touchend', () => {
     isDraggingSlider = false;
+    setTimeout(() => { dragMoved = false; }, 50);
   });
 
   window.addEventListener('touchcancel', () => {
     isDraggingSlider = false;
+    dragMoved = false;
   });
 
-  // Clicking anywhere on splitContainer snaps slider
+  // Smooth Tap-to-Compare anywhere on splitContainer
   splitContainer.addEventListener('click', (e) => {
-    handleSliderMove(e.clientX);
+    if (dragMoved) {
+      dragMoved = false;
+      return;
+    }
+    const rect = splitContainer.getBoundingClientRect();
+    if (!rect || rect.width <= 0) return;
+    const x = e.clientX - rect.left;
+    const pct = (x / rect.width) * 100;
+
+    // Enable smooth animation for intentional tap-jumps
+    splitDivider.style.transition = 'left 0.22s cubic-bezier(0.16, 1, 0.3, 1)';
+    splitBeforeLayer.style.transition = 'clip-path 0.22s cubic-bezier(0.16, 1, 0.3, 1)';
+    setSliderPosition(pct);
   });
 
   // ── Drag & Drop & Paste Event Listeners ───────────────────────────────────
@@ -340,6 +374,9 @@
 
     dropZone.style.display = 'none';
     workspace.classList.add('active');
+    if (mobileActionDock) {
+      mobileActionDock.classList.add('active');
+    }
   }
 
   // ── Render Loupe Magnifier ──────────────────────────────────────────────
@@ -528,14 +565,19 @@
     sampleImg.src = cvs.toDataURL('image/png');
   }
 
-  // ── Download Handlers ───────────────────────────────────────────────────
-  downloadPngBtn.addEventListener('click', () => {
+  // ── Download & Reset Handlers ──────────────────────────────────────────
+  function triggerPngDownload() {
     if (!currentCleanedCanvas) return;
     const a = document.createElement('a');
     a.download = `${currentFileName}-cleaned.png`;
     a.href = currentCleanedCanvas.toDataURL('image/png');
     a.click();
-  });
+  }
+
+  downloadPngBtn.addEventListener('click', triggerPngDownload);
+  if (mobileDownloadPngBtn) {
+    mobileDownloadPngBtn.addEventListener('click', triggerPngDownload);
+  }
 
   downloadJpgBtn.addEventListener('click', () => {
     if (!currentCleanedCanvas) return;
@@ -545,8 +587,11 @@
     a.click();
   });
 
-  resetBtn.addEventListener('click', () => {
+  function resetWorkspace() {
     workspace.classList.remove('active');
+    if (mobileActionDock) {
+      mobileActionDock.classList.remove('active');
+    }
     batchSection.classList.remove('active');
     dropZone.style.display = 'block';
     currentOriginalCanvas = null;
@@ -554,7 +599,33 @@
     splitImgBefore.src = '';
     splitImgAfter.src = '';
     batchList.innerHTML = '';
-  });
+  }
+
+  resetBtn.addEventListener('click', resetWorkspace);
+  if (mobileResetBtn) {
+    mobileResetBtn.addEventListener('click', resetWorkspace);
+  }
+
+  // ── Technical Section Tab Switching ──────────────────────────────────────
+  if (tabBtnPillars && tabBtnBenchmark && panelPillars && panelBenchmark) {
+    tabBtnPillars.addEventListener('click', () => {
+      tabBtnPillars.classList.add('active');
+      tabBtnPillars.setAttribute('aria-selected', 'true');
+      tabBtnBenchmark.classList.remove('active');
+      tabBtnBenchmark.setAttribute('aria-selected', 'false');
+      panelPillars.classList.add('active');
+      panelBenchmark.classList.remove('active');
+    });
+
+    tabBtnBenchmark.addEventListener('click', () => {
+      tabBtnBenchmark.classList.add('active');
+      tabBtnBenchmark.setAttribute('aria-selected', 'true');
+      tabBtnPillars.classList.remove('active');
+      tabBtnPillars.setAttribute('aria-selected', 'false');
+      panelBenchmark.classList.add('active');
+      panelPillars.classList.remove('active');
+    });
+  }
 
   // ── Processing Modal Helpers ───────────────────────────────────────────
   function showProcessing(step, details) {

@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <title>Gemini Watermark Remover — AI Sparkle Cleaner (100% Client-Side Privacy)</title>
   <meta name="description" content="Erase Gemini and Imagen 3 AI watermark sparkles with 100% on-device privacy. Powered by Dual-Channel Gradient Localization and Optical Reverse Alpha Deblending.">
-  <meta name="theme-color" content="#07090e">
+  <meta name="theme-color" content="#080a0f">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
@@ -16,14 +16,14 @@
   <meta property="og:description" content="Erase Gemini AI watermark sparkles instantly in your browser. Zero server uploads. Infinite privacy.">
   <meta property="og:image" content="assets/wm/gemini_bg_96.png">
 
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=2.2.0">
   <link rel="icon" type="image/png" href="assets/wm/gemini_bg_48.png">
 </head>
 <body>
 
   <div class="app-container">
     <!-- Header -->
-    <header>
+    <header class="app-header">
       <div class="brand">
         <div class="brand-icon">
           <!-- Sparkle SVG Icon -->
@@ -31,23 +31,24 @@
             <path d="M12 2L14.39 8.26L21 9.27L16.27 14.14L17.59 21.02L12 17.77L6.41 21.02L7.73 14.14L3 9.27L9.61 8.26L12 2Z"/>
           </svg>
         </div>
-        <div>
-          <div class="brand-title">Listora Sparkle Remover</div>
-          <div class="brand-subtitle">Gemini &amp; Imagen 3 Watermark Inpainting Engine</div>
+        <div class="brand-text">
+          <div class="brand-title">ClearSpark <span class="brand-highlight">AI</span></div>
+          <div class="brand-subtitle">Gemini &amp; Imagen 3 Optical Unblending Engine</div>
         </div>
       </div>
 
       <div class="header-badges">
         <span class="badge badge-privacy">
           <span class="badge-dot"></span>
-          🔒 100% Client-Side Privacy
+          <span class="badge-text-full">🔒 100% Client-Side Privacy</span>
+          <span class="badge-text-compact">🔒 Offline</span>
         </span>
-        <span class="badge badge-version">v2.0 Dual-Engine AI</span>
-        <a href="https://github.com/MythroniX24/listora-watermark-web" target="_blank" rel="noopener noreferrer" class="btn-github">
+        <span class="badge badge-version">v2.2 Optical</span>
+        <a href="https://github.com/MythroniX24/listora-watermark-web" target="_blank" rel="noopener noreferrer" class="btn-github" aria-label="GitHub Repository">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
           </svg>
-          GitHub
+          <span class="btn-github-text">GitHub</span>
         </a>
       </div>
     </header>
@@ -55,7 +56,7 @@
     <!-- Hero Title -->
     <section class="hero">
       <h1>Clean AI Watermarks with <span>Pixel Precision</span></h1>
-      <p>Instant on-device sparkle removal powered by Dual-Channel Gradient Localization, Candidate Suppression Delta verification, and Sub-Pixel Reverse Alpha Blending. Your photos never touch any server.</p>
+      <p>Instant on-device sparkle removal powered by Dual-Channel Gradient Localization, Candidate Suppression Delta, and Sub-Pixel Reverse Alpha Blending. Your photos never touch any server.</p>
     </section>
 
     <!-- Upload Drop Zone -->
@@ -91,8 +92,9 @@
             <span>Interactive Comparison</span>
             <span class="status-pill" id="cleanStatusBadge">✨ Sparkle Erased Cleanly</span>
           </div>
-          <div style="font-size: 0.85rem; color: var(--text-secondary);">
-            Drag slider left/right to compare
+          <div class="workspace-hint">
+            <span class="hint-desktop">Drag slider or click left/right to compare</span>
+            <span class="hint-mobile">Swipe or tap to compare</span>
           </div>
         </div>
 
@@ -107,7 +109,7 @@
               <img id="splitImgBefore" class="split-img-before" alt="Original image">
             </div>
 
-            <!-- Divider Line & Handle -->
+            <!-- Divider Line & Handle (with 48px touch hitbox) -->
             <div id="splitDivider" class="split-divider">
               <div class="split-handle">
                 <svg viewBox="0 0 24 24">
@@ -144,7 +146,7 @@
             </div>
           </div>
 
-          <!-- Stats Grid -->
+          <!-- Stats Grid (Responsive 2x2 on Mobile) -->
           <div class="stats-grid">
             <div class="stat-item">
               <div class="stat-label">Watermark Size</div>
@@ -165,7 +167,7 @@
           </div>
         </div>
 
-        <!-- Action Bar -->
+        <!-- Action Bar (Desktop) -->
         <div class="actions-bar">
           <div class="actions-download-group">
             <button type="button" class="btn btn-primary" id="downloadPngBtn">
@@ -185,6 +187,21 @@
       </div>
     </section>
 
+    <!-- Floating Mobile Sticky Action Dock -->
+    <div class="mobile-action-dock" id="mobileActionDock">
+      <button type="button" class="btn btn-primary btn-dock-primary" id="mobileDownloadPngBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+        </svg>
+        <span>Download PNG</span>
+      </button>
+      <button type="button" class="btn btn-secondary btn-dock-icon" id="mobileResetBtn" title="Clean Another Image" aria-label="Clean Another Image">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+        </svg>
+      </button>
+    </div>
+
     <!-- Batch Section -->
     <section class="batch-section" id="batchSection">
       <div class="batch-card">
@@ -196,81 +213,95 @@
       </div>
     </section>
 
-    <!-- Technical Architecture Deep Dive -->
+    <!-- Technical Architecture & Empirical Benchmark Tabs -->
     <section class="tech-section">
-      <h2 class="tech-title">5-Pillar Trust-Grade Architecture</h2>
-      <div class="pillars-grid">
-        <div class="pillar-card">
-          <div class="pillar-num">PILLAR 01</div>
-          <div class="pillar-heading">Multi-Scale Dense Pyramid</div>
-          <div class="pillar-desc">Scans multi-scale pyramids from 34px to 96px across all corners using Normalized Cross-Correlation (NCC) to match the official Gemini &amp; Imagen 3 sparkle footprint.</div>
-        </div>
-        <div class="pillar-card">
-          <div class="pillar-num">PILLAR 02</div>
-          <div class="pillar-heading">Sub-Pixel Quadratic Localization</div>
-          <div class="pillar-desc">Applies 2D parabolic interpolation across adjacent correlation peaks, resolving watermark coordinates with fractional sub-pixel precision to avoid edge halos.</div>
-        </div>
-        <div class="pillar-card">
-          <div class="pillar-num">PILLAR 03</div>
-          <div class="pillar-heading">Linear-Light Gain Sweep</div>
-          <div class="pillar-desc">Tests perceptual alpha blending in both Gamma 2.2 linear light and sRGB color space across gain sweeps (0.70 to 1.30) to verify authentic watermarks without false positives.</div>
-        </div>
-        <div class="pillar-card">
-          <div class="pillar-num">PILLAR 04</div>
-          <div class="pillar-heading">Optical Reverse Alpha Deblending</div>
-          <div class="pillar-desc">Mathematically inverts the optical blending equation: I_clean = (I_wm - 255 * alpha) / (1 - alpha), recovering 100% authentic sensor pixels with zero blur and zero texture loss.</div>
-        </div>
-        <div class="pillar-card">
-          <div class="pillar-num">PILLAR 05</div>
-          <div class="pillar-heading">Micro-Grain Texture Matching</div>
-          <div class="pillar-desc">Measures the surrounding background high-frequency Laplacian variance and injects matching micro-grain noise, preventing flat or blurry plastic patches.</div>
-        </div>
-        <div class="pillar-card">
-          <div class="pillar-num">PILLAR 06</div>
-          <div class="pillar-heading">100% Client-Side Privacy</div>
-          <div class="pillar-desc">Zero cloud servers, zero external API calls. All calculations run strictly in your browser via HTML5 Canvas and typed arrays. Your files never leave your device.</div>
+      <div class="tech-tabs-header">
+        <div class="tech-tabs" role="tablist">
+          <button type="button" class="tech-tab active" data-tab="pillars" role="tab" aria-selected="true" id="tabBtnPillars">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            5-Pillar Architecture
+          </button>
+          <button type="button" class="tech-tab" data-tab="benchmark" role="tab" aria-selected="false" id="tabBtnBenchmark">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+            101-Image Benchmark Audit
+          </button>
         </div>
       </div>
-    </section>
 
-    <!-- Empirical Benchmark & Audit Proof -->
-    <section class="tech-section" style="margin-top: 48px;">
-      <h2 class="tech-title">Empirical 101-Image Benchmark Audit</h2>
-      <p style="text-align: center; color: var(--text-secondary); max-width: 700px; margin: -14px auto 28px;">
-        Rigorously evaluated on 101 diverse stress-test images across portraits, architectural edges, night scenes, foliage, and studio products.
-      </p>
-      <div class="stats-grid" style="margin-bottom: 24px;">
-        <div class="stat-item">
-          <div class="stat-label">Benchmark Test Set</div>
-          <div class="stat-value highlight-cyan">101 Images</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-label">Success &amp; Elimination Rate</div>
-          <div class="stat-value highlight-green">101 / 101 (100%)</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-label">Residual Sparkle Correlation</div>
-          <div class="stat-value highlight-green">0.0192 (Near 0)</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-label">Average PSNR Fidelity</div>
-          <div class="stat-value highlight-cyan">37.62 dB</div>
+      <!-- Tab 1: Architecture Pillars -->
+      <div class="tab-panel active" id="panelPillars" role="tabpanel">
+        <div class="pillars-grid">
+          <div class="pillar-card">
+            <div class="pillar-num">PILLAR 01</div>
+            <div class="pillar-heading">Multi-Scale Dense Pyramid</div>
+            <div class="pillar-desc">Scans multi-scale pyramids from 34px to 96px across all corners using Normalized Cross-Correlation (NCC) to match official Gemini &amp; Imagen 3 sparkle footprints.</div>
+          </div>
+          <div class="pillar-card">
+            <div class="pillar-num">PILLAR 02</div>
+            <div class="pillar-heading">Dual Sobel Gradient Analysis</div>
+            <div class="pillar-desc">Extracts 2D gradient magnitude kernels alongside luminance, ensuring 100% true-positive identification even across complex, high-contrast textures.</div>
+          </div>
+          <div class="pillar-card">
+            <div class="pillar-num">PILLAR 03</div>
+            <div class="pillar-heading">Candidate Suppression Delta</div>
+            <div class="pillar-desc">Simulates candidate unblending and evaluates suppression delta (&Delta; = Score_before - Score_after), discarding false-positive background textures before modification.</div>
+          </div>
+          <div class="pillar-card">
+            <div class="pillar-num">PILLAR 04</div>
+            <div class="pillar-heading">Optical Reverse Alpha Deblending</div>
+            <div class="pillar-desc">Inverts the optical blending equation: I_clean = (I_wm - 255 &bull; &alpha; &bull; g) / (1 - &alpha; &bull; g), recovering authentic sensor pixels with zero blur and zero texture loss.</div>
+          </div>
+          <div class="pillar-card">
+            <div class="pillar-num">PILLAR 05</div>
+            <div class="pillar-heading">Adaptive Multi-Gain Optimization</div>
+            <div class="pillar-desc">Sweeps optimal alpha intensities to match JPEG compression levels, eliminating residual halos and dark under-exposure artifacts.</div>
+          </div>
+          <div class="pillar-card">
+            <div class="pillar-num">PILLAR 06</div>
+            <div class="pillar-heading">100% Client-Side Privacy</div>
+            <div class="pillar-desc">Zero cloud servers, zero external API calls. All calculations run strictly in your browser via HTML5 Canvas and typed arrays. Your files never leave your device.</div>
+          </div>
         </div>
       </div>
-      <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 18px; text-align: center;">
-        <h4 style="font-size: 0.95rem; margin-bottom: 12px; color: var(--text-secondary);">Visual Verification Proof (Side-by-Side Inpainting Crops)</h4>
-        <img src="assets/benchmark_visual_proof.png" alt="100 Image Benchmark Visual Proof" style="max-width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+
+      <!-- Tab 2: Empirical Benchmark Audit -->
+      <div class="tab-panel" id="panelBenchmark" role="tabpanel">
+        <p class="benchmark-lead">
+          Rigorously evaluated on 101 diverse stress-test images across portraits, architectural edges, night scenes, foliage, and studio products.
+        </p>
+        <div class="stats-grid" style="margin-bottom: 24px;">
+          <div class="stat-item">
+            <div class="stat-label">Benchmark Test Set</div>
+            <div class="stat-value highlight-cyan">101 Images</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Success &amp; Elimination Rate</div>
+            <div class="stat-value highlight-green">101 / 101 (100%)</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Residual Sparkle Correlation</div>
+            <div class="stat-value highlight-green">0.0192 (Near 0)</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Average PSNR Fidelity</div>
+            <div class="stat-value highlight-cyan">37.62 dB</div>
+          </div>
+        </div>
+        <div class="benchmark-proof-box">
+          <h4 class="benchmark-proof-title">Visual Verification Proof (Side-by-Side Optical Crops)</h4>
+          <img src="assets/benchmark_visual_proof.png" alt="100 Image Benchmark Visual Proof" class="benchmark-proof-img">
+        </div>
       </div>
     </section>
 
     <!-- Footer -->
     <footer>
-      <p>Developed with precision by <a href="https://github.com/MythroniX24" target="_blank" rel="noopener noreferrer">MythroniX24</a> &bull; Part of the Listora AI Project.</p>
-      <p style="margin-top: 6px; font-size: 0.78rem;">Released under the MIT License &bull; Client-Side Inpainting Engine v2.0.0 Dual-Engine AI</p>
+      <p>Developed with precision by <a href="https://github.com/MythroniX24" target="_blank" rel="noopener noreferrer">MythroniX24</a> &bull; ClearSpark AI Project.</p>
+      <p class="footer-sub">Released under the MIT License &bull; Client-Side Optical Engine v2.2</p>
     </footer>
   </div>
 
-  <script src="watermark-cleaner.js?v=2.1.0"></script>
-  <script src="app.js?v=2.1.0"></script>
+  <script src="watermark-cleaner.js?v=2.2.0"></script>
+  <script src="app.js?v=2.2.0"></script>
 </body>
 </html>
