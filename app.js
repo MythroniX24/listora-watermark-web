@@ -267,7 +267,7 @@
       px[i] = (a << 24) | (r << 16) | (g << 8) | b;
     }
 
-    showProcessing('Executing Fast Marching Telea Inpainting...', 'Analyzing corner pyramids and linear-light blending');
+    showProcessing('Executing Dual-Channel Optical Unblending...', 'Dual Sobel gradient correlation and candidate suppression delta');
 
     // Yield to render frame before intensive computation
     await new Promise((r) => setTimeout(r, 40));
