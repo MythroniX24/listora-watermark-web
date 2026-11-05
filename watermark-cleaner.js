@@ -614,38 +614,52 @@
         const s = cand.side;
         const tplObj = this.getTemplate(s);
         const trialPatch = new Float32Array(s * s);
-        let tidx = 0;
 
-        for (let py = 0; py < s; py++) {
-          const rowOff = (cand.y + py) * width + cand.x;
-          for (let px = 0; px < s; px++) {
-            const p = pixels[rowOff + px];
-            const origR = (p >> 16) & 0xFF;
-            const origG = (p >> 8) & 0xFF;
-            const origB = p & 0xFF;
-            const a = Math.min(0.99, Math.max(0.0, tplObj.alpha[tidx] - (3.0 / 255.0)));
-            if (a >= 0.002) {
-              const oneMinus = 1.0 - a;
-              const clR = Math.max(0, Math.min(255, Math.round((origR - a * 255.0) / oneMinus)));
-              const clG = Math.max(0, Math.min(255, Math.round((origG - a * 255.0) / oneMinus)));
-              const clB = Math.max(0, Math.min(255, Math.round((origB - a * 255.0) / oneMinus)));
-              trialPatch[tidx] = 0.299 * clR + 0.587 * clG + 0.114 * clB;
-            } else {
-              trialPatch[tidx] = 0.299 * origR + 0.587 * origG + 0.114 * origB;
+        let bestCandDelta = -1.0;
+        const trialGains = [1.0, 0.70, 0.45, 0.25, 0.12];
+
+        for (let gi = 0; gi < trialGains.length; gi++) {
+          const g = trialGains[gi];
+          let tidx = 0;
+          for (let py = 0; py < s; py++) {
+            const rowOff = (cand.y + py) * width + cand.x;
+            for (let px = 0; px < s; px++) {
+              const p = pixels[rowOff + px];
+              const origR = (p >> 16) & 0xFF;
+              const origG = (p >> 8) & 0xFF;
+              const origB = p & 0xFF;
+              const a = Math.min(0.99, Math.max(0.0, (tplObj.alpha[tidx] - (3.0 / 255.0)) * g));
+              if (a >= 0.002) {
+                const oneMinus = 1.0 - a;
+                const clR = Math.max(0, Math.min(255, Math.round((origR - a * 255.0) / oneMinus)));
+                const clG = Math.max(0, Math.min(255, Math.round((origG - a * 255.0) / oneMinus)));
+                const clB = Math.max(0, Math.min(255, Math.round((origB - a * 255.0) / oneMinus)));
+                trialPatch[tidx] = 0.299 * clR + 0.587 * clG + 0.114 * clB;
+              } else {
+                trialPatch[tidx] = 0.299 * origR + 0.587 * origG + 0.114 * origB;
+              }
+              tidx++;
             }
-            tidx++;
+          }
+
+          const after = computeSpatialAndGradNcc(trialPatch, tplObj, s);
+          // Reject artificial gradient blowup
+          if (after.gradScore > 0.40 && after.gradScore > cand.grad_score + 0.20) {
+            continue;
+          }
+          const delta = (cand.spatial_score - after.spatialScore) + 1.2 * (cand.grad_score - after.gradScore);
+          if (delta > bestCandDelta) {
+            bestCandDelta = delta;
           }
         }
 
-        const after = computeSpatialAndGradNcc(trialPatch, tplObj, s);
-        const delta = (cand.spatial_score - after.spatialScore) + 1.2 * (cand.grad_score - after.gradScore);
-        if (delta > bestSuppression) {
-          bestSuppression = delta;
+        if (bestCandDelta > bestSuppression) {
+          bestSuppression = bestCandDelta;
           bestCandidate = cand;
         }
       }
 
-      if (bestCandidate && (bestSuppression > 0.15 || bestCandidate.grad_score > 0.20)) {
+      if (bestCandidate && (bestSuppression > 0.06 || bestCandidate.grad_score > 0.18)) {
         bestCandidate.score = bestCandidate.combined_score;
         return bestCandidate;
       }
@@ -710,7 +724,7 @@
       let bestGain = 1.0;
       const testPatch = new Float32Array(s * s);
 
-      for (const testGain of [0.70, 0.85, 1.00, 1.05]) {
+      for (const testGain of [0.08, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95, 1.00, 1.05]) {
         let pidx = 0;
         for (let py = 0; py < s; py++) {
           const rowOff = (hy + py) * width + hx;
